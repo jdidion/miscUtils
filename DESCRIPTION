@@ -1,0 +1,9 @@
+Package: miscUtils
+Title: Miscellaneous R classes and functions I use frequently.
+Version: 0.0.1
+Authors@R: person("John", "Didion", email = "code@didion.net", role = c("aut", "cre"))
+Description: Miscellaneous R classes and functions I use frequently.
+Depends: R (>= 3.1.3)
+License: GPL (>= 2)
+Imports: intervals
+LazyData: true
