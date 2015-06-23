@@ -23,3 +23,7 @@ my.load <- function(f, obj.names=NULL, return.list=F) {
         return(get(obj.names[1], envir=e))
     }
 }
+
+my.save.image <- function (file) {
+    .Internal(saveToConn(names(.GlobalEnv), gzfile(file, "wb"), FALSE, NULL, .GlobalEnv, TRUE))
+}
