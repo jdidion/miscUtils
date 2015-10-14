@@ -34,16 +34,20 @@
 # cache$cache("results.RData", expression({ print("evaluating") ; list(x=10, y=-1) })) # evaluated because code changed
 # => "evaluating"
 Cache <- setRefClass("Cache", 
-    fields=list(parent.env="environment", digest="logical", store="ANY", store.file="character", 
+    fields=list(parent.env="environment", cache.dir="character", digest="logical", store="ANY", store.file="character", 
                 eval.missing.hash="logical"), 
     methods=list(
-        initialize=function(parent.env, digest=library(digest, logical.return=TRUE, quietly=TRUE), 
+        initialize=function(parent.env, cache.dir=".", digest=library(digest, logical.return=TRUE, quietly=TRUE), 
                             store=NULL, store.file="~/.RHashStore", eval.missing.hash=TRUE) {
-            callSuper(parent.env=parent.env, digest=digest, store=store, store.file=store.file,
+            callSuper(parent.env=parent.env, cache.dir=cache.dir, digest=digest, store=store, store.file=store.file,
                       eval.missing.hash=eval.missing.hash)
+            if (!dir.exists(.self$cache.dir)) {
+                dir.create(.self$cache.dir)
+            }
             .self$.init.hash.store()
         },
         cache=function(file, expr, env=new.env(), add.to.parent=TRUE, force=FALSE) {
+            file <- file.path(.self$cache.dir, file)
             evl <- force || !file.exists(file)
             hash <- NULL
             if (!evl && .self$digest) {
