@@ -86,6 +86,7 @@ Cache <- setRefClass("Cache",
             .self$.init.hash.store()
         },
         cache=function(file, expr, env=new.env(), add.to.parent=TRUE,
+                       save.var.names=NULL, inject.var.names=NULL,
                        force=FALSE) {
             file <- file.path(.self$cache.dir, file)
             evl <- force || !file.exists(file)
@@ -101,6 +102,11 @@ Cache <- setRefClass("Cache",
             }
             if (evl) {
                 result <- eval(expr, envir=env)
+                if (!is.null(save.var.names)) {
+                    for (n in setdiff(ls(env), save.var.names)) {
+                        rm(n, envir=env)
+                    }
+                }
                 save(env, result, file=file)
                 if (.self$digest) {
                     if (is.null(hash)) {
@@ -114,7 +120,13 @@ Cache <- setRefClass("Cache",
                 load(file)
             }
             if (add.to.parent) {
-                for (n in ls(env)) {
+                if (is.null(inject.var.names)) {
+                    inject.var.names <- ls(env)
+                }
+                else {
+                    inject.var.names <- intersect(inject.var.names, ls(env))
+                }
+                for (n in inject.var.names) {
                     assign(n, get(n, envir=env), envir=.self$parent.env)
                 }
                 result
